@@ -23,7 +23,17 @@
 		<java.version>1.8</java.version>
 		<appengine.version>1.9.30</appengine.version>
 	</properties>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Brixton.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<!--<dependency>-->
 			<!--<groupId>org.springframework.boot</groupId>-->
