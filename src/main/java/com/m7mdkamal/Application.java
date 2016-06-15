@@ -8,13 +8,14 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws IOException {
         SpringApplication.run(Application.class, args);
@@ -22,14 +23,14 @@ public class Application {
 
 //        BuildTool maven = new Maven();
 
-//        Algorithm algo = new Algorithm("mahmouedd", "algonamee");
+        Algorithm algo = new Algorithm("mahmouedd", "algonamee");
 //        ArrayList<JavaFile> jfs = algo.getFiles();
 //        for (JavaFile jf : jfs)
 //            System.out.println(jf.getFileName()+" "+jf.getId());
 //        System.out.println(.toString());
-//        algo.init();
-//        algo.compile();
-//        System.out.println(algo.run(""));
+        algo.init();
+        algo.compile();
+        System.out.println(algo.run(""));
 //
 //        ProcessBuilder pb = new ProcessBuilder();
 //

@@ -15,10 +15,10 @@ import java.util.ArrayList;
 public class BasicController {
 
     @RequestMapping("/")
-    public String root(){
+    public String root() throws IOException {
         Algorithm algo = new Algorithm("mohammed", "facedetection");
-//        algo.init();
-//        algo.compile();
+        algo.init();
+        algo.compile();
         String s = "";
         try {
             s = algo.run("100");
