@@ -57,13 +57,15 @@ public class Algorithm {
             lines.add(getBaseDirCommand());
             lines.add(this.btool.generate());
 
+
+
 //            File file = new File(parent.getAbsolutePath() + "/init.sh");
             File file = createTempFile(lines);
 //            file.setExecutable(true);
 
 //            FileUtils.writeStringToFile(file, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.91-6.b14.fc23.x86_64\n", true);
 
-
+            System.out.println(FileUtils.readFileToString(file));
 
             CommandLine cmdLine = new CommandLine(file);
             DefaultExecutor exec = new DefaultExecutor();

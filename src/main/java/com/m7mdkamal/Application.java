@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @SpringBootApplication
-public class Application extends SpringBootServletInitializer {
+public class Application {
 
     public static void main(String[] args) throws IOException {
         SpringApplication.run(Application.class, args);
@@ -23,7 +23,7 @@ public class Application extends SpringBootServletInitializer {
 
 //        BuildTool maven = new Maven();
 
-        Algorithm algo = new Algorithm("mahmouedd", "algonamee");
+        Algorithm algo = new Algorithm("mahd", "algonamee");
 //        ArrayList<JavaFile> jfs = algo.getFiles();
 //        for (JavaFile jf : jfs)
 //            System.out.println(jf.getFileName()+" "+jf.getId());
