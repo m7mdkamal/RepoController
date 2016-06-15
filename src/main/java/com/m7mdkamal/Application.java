@@ -4,7 +4,6 @@ import com.m7mdkamal.algorithm.Algorithm;
 import com.m7mdkamal.buildtool.BuildTool;
 import com.m7mdkamal.buildtool.Maven;
 import com.m7mdkamal.commandline.Executor;
-import com.m7mdkamal.model.JavaFile;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.springframework.boot.SpringApplication;
