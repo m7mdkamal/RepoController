@@ -3,8 +3,6 @@ package com.m7mdkamal.algorithm;
 import com.m7mdkamal.buildtool.BuildTool;
 import com.m7mdkamal.buildtool.Maven;
 import com.m7mdkamal.model.JavaFile;
-import com.sun.deploy.uitoolkit.impl.fx.Utils;
-import com.sun.deploy.xdg.BaseDir;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
