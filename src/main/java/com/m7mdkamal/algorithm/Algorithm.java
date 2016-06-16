@@ -176,7 +176,7 @@ public class Algorithm {
 
     private File createTempFile(List<String> lines) throws IOException {
         // TODO: 6/11/16 delete it.
-        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.91-6.b14.fc23.x86_64");
+        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64");
 
         File tempFile = File.createTempFile("tmp", ".sh");
         tempFile.setExecutable(true);
