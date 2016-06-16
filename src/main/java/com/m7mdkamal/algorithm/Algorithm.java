@@ -11,6 +11,8 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +27,7 @@ public class Algorithm {
 
     private BuildTool btool;
 
-    private String baseDir = "/home/mohamed/testmvn/client/";
+    private String baseDir = "/var/algoritmicloud/";
     private String userDir;
     private String algoDir;
 
@@ -35,102 +37,146 @@ public class Algorithm {
         this.btool = new Maven(username, algoname);
         this.userDir = this.baseDir + username + "/";
         this.algoDir = this.userDir + algoname + "/";
+
     }
 
-    public Algorithm(String username, String algoname, BuildTool btool) {
-        this.username = username;
-        this.algoname = algoname;
-        this.btool = btool;
-    }
-
-
-    public void init() {
-        // build the sh file
-        // cd to the basedir
-        // execute the command
-        File parent = new File(this.baseDir + username);
-//        File.createTempFile(baseDir,"",file);
+    public Result init() {
+        //create new directory for the user if not exist
+        File parent = new File(userDir);
         parent.mkdir();
+        String log = "";
         try {
             List<String> lines = new ArrayList<>();
-
             lines.add(getBaseDirCommand());
             lines.add(this.btool.generate());
 
-
-
-//            File file = new File(parent.getAbsolutePath() + "/init.sh");
             File file = createTempFile(lines);
-//            file.setExecutable(true);
-
-//            FileUtils.writeStringToFile(file, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.91-6.b14.fc23.x86_64\n", true);
-
             System.out.println(FileUtils.readFileToString(file));
 
-            CommandLine cmdLine = new CommandLine(file);
-            DefaultExecutor exec = new DefaultExecutor();
-            exec.execute(cmdLine);
-        } catch (IOException e) {
-            e.printStackTrace();
+            log = this.execute(file);
+            return new Result(Status.SUCCESS, log);
 
+        } catch (IOException e) {
+            return new Result(Status.FAILURE, log, e);
         }
 
-
     }
+
+    public Result compile() {
+        return compile(true);
+    }
+
+    public Result compile(boolean mvn) {
+        List<String> lines = new ArrayList<>();
+        lines.add("cd " + this.algoDir);
+
+
+        // TODO: 6/16/16 Redo this method again! - Exit Values
+        if (mvn)
+            lines.add(btool.compile());
+        else {
+            File file = new File(algoDir+"target/classes/");
+            file.mkdirs();
+            lines.add("javac src/main/java/" + username + "/*.java -d target/classes/ ");
+        }
+
+        File file = null;
+        String log = "";
+        try {
+            file = createTempFile(lines);
+            System.out.println(FileUtils.readFileToString(file));
+            log = execute(file);
+            return new Result(Status.SUCCESS, log);
+        } catch (IOException e) {
+            return new Result(Status.FAILURE, log, e);
+        }
+    }
+
 
     // ~/testmvn/client/mohammed/facedetection/target/classes 
     // java  -classpath . mohammed.App mohammed/App.class
 
-    public String run(String input) throws IOException {
+    public Result run(String input){
+
         List<String> lines = new ArrayList<>();
 
         lines.add("cd " + this.algoDir + "target/classes");
-        lines.add("java  -classpath . "+username+".App " + input);
+        lines.add("java  -classpath . " + username + ".App " + input);
+
         File file = null;
-        file = createTempFile(lines);
 
-        System.out.println(FileUtils.readFileToString(file));
+        String out = "";
+        try {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CommandLine cmdLine = new CommandLine(file);
-        DefaultExecutor exec = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-        exec.setStreamHandler(streamHandler);
-        exec.execute(cmdLine);
-        return outputStream.toString();
-    }
+            file = createTempFile(lines);
+            System.out.println(FileUtils.readFileToString(file));
+             out= execute(file);
+            return new Result(Status.SUCCESS, out );
+        } catch (IOException e) {
+            return new Result(Status.SUCCESS, out , e);
+        }
 
-    public void addClass() {
-    }
-
-
-    public void updateDependency() {
-    }
-
-    public void compile() throws IOException {
-        List<String> lines = new ArrayList<>();
-
-        lines.add("cd " + this.algoDir);
-        lines.add(btool.compile());
-        File file = null;
-        file = createTempFile(lines);
-
-        System.out.println(FileUtils.readFileToString(file));
-
-        CommandLine cmdLine = new CommandLine(file);
-        DefaultExecutor exec = new DefaultExecutor();
-        exec.execute(cmdLine);
 
 
     }
+
+    public Result updateFile(String name, String content) {
+        File file = new File(this.algoDir + "src/main/java/" + this.username + "/" + name);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileUtils.writeStringToFile(file, content);
+            return new Result(Status.SUCCESS, null);
+        } catch (IOException e) {
+            return new Result(Status.FAILURE, exceptionToString(e));
+        }
+    }
+
+
+    public Result updateDependency(String pom) {
+        File file = new File(this.algoDir + "pom.xml");
+        String log = "";
+        try {
+            FileUtils.writeStringToFile(file, pom);
+
+            List<String> lines = new ArrayList<>();
+
+            lines.add("cd " + this.algoDir);
+            lines.add(btool.updateDependency());
+
+            file = createTempFile(lines);
+            System.out.println(FileUtils.readFileToString(file));
+            log = execute(file);
+            return new Result(Status.SUCCESS, log );
+
+        } catch (IOException e) {
+            return new Result(Status.FAILURE, log , e);
+        }
+    }
+
 
     private String getBaseDirCommand() {
         return "cd " + this.baseDir + username + ";\n";
     }
 
+
+    private String execute(File file) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        CommandLine cmdLine = new CommandLine(file);
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+
+        DefaultExecutor exec = new DefaultExecutor();
+        exec.setStreamHandler(streamHandler);
+        exec.setExitValues(new int[]{0,1});
+        exec.execute(cmdLine);
+
+        return outputStream.toString();
+    }
+
     private File createTempFile(List<String> lines) throws IOException {
         // TODO: 6/11/16 delete it.
-//        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.91-6.b14.fc23.x86_64");
+        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.91-6.b14.fc23.x86_64");
 
         File tempFile = File.createTempFile("tmp", ".sh");
         tempFile.setExecutable(true);
@@ -140,10 +186,17 @@ public class Algorithm {
         return tempFile;
     }
 
+    private String exceptionToString(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
+    }
+
     public ArrayList<JavaFile> getFiles() throws IOException {
         List<String> lines = new ArrayList<>();
 
-        lines.add("cd " + this.algoDir +"src/main/java/"+username);
+        lines.add("cd " + this.algoDir + "src/main/java/" + username);
         lines.add("ls");
         File file = null;
         file = createTempFile(lines);
@@ -158,11 +211,46 @@ public class Algorithm {
         exec.execute(cmdLine);
         String linesArr[] = outputStream.toString().split("\\r?\\n");
         ArrayList<JavaFile> jf = new ArrayList<>();
-        for (String l : linesArr ){
+        for (String l : linesArr) {
             jf.add(new JavaFile(l, UUID.randomUUID().toString()));
         }
 
         return jf;
     }
 
+    public Boolean delete() {
+        List<String> lines = new ArrayList<>();
+        lines.add("rm -rf " + this.getAlgoDir());
+
+        File file = null;
+        try {
+            file = createTempFile(lines);
+            System.out.println(FileUtils.readFileToString(file));
+            this.execute(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAlgoname() {
+        return algoname;
+    }
+
+    public String getBaseDir() {
+        return baseDir;
+    }
+
+    public String getUserDir() {
+        return userDir;
+    }
+
+    public String getAlgoDir() {
+        return algoDir;
+    }
 }

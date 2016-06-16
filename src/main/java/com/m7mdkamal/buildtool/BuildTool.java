@@ -10,5 +10,5 @@ public interface BuildTool {
     String compile();
     String install();
     String clean();
-
+    String updateDependency();
 }

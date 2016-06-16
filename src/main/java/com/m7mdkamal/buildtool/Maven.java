@@ -14,7 +14,7 @@ public class Maven implements BuildTool{
     private String groudId = "username";
     private String artifactId= "test";
     private String archetypeArtifactId = "maven-archetype-quickstart";
-    private String archetypeCatalog = "remote,local";
+    private String archetypeCatalog = "local";
 
 
     public Maven(String username, String algoname) {
@@ -58,6 +58,11 @@ public class Maven implements BuildTool{
     @Override
     public String clean() {
         return "mvn clean";
+    }
+
+    @Override
+    public String updateDependency() {
+        return "mvn dependency:resolve";
     }
 
 
