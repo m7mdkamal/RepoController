@@ -11,13 +11,15 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer{
 
     public static void main(String[] args) throws IOException {
+        System.setOut(new PrintStream(File.createTempFile("springboot",".txt")));
         SpringApplication.run(Application.class, args);
-        System.out.println("APP STARTS HERE");
     }
 }
