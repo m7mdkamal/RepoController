@@ -20,6 +20,8 @@ public class Application extends SpringBootServletInitializer{
 
     public static void main(String[] args) throws IOException {
         System.setOut(new PrintStream(File.createTempFile("springboot",".txt")));
+        System.out.println("HELLO ");
         SpringApplication.run(Application.class, args);
+        System.out.println("BYE ");
     }
 }
