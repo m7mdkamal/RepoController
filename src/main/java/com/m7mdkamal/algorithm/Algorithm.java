@@ -183,7 +183,7 @@ public class Algorithm {
         lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-openjdk");
 
         File tempFile = File.createTempFile("tmp", ".sh");
-        tempFile.setExecutable(true);
+//        tempFile.setExecutable(true);
         for (String line : lines) {
             FileUtils.writeStringToFile(tempFile, line + "\n", true);
         }
