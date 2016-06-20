@@ -182,7 +182,7 @@ public class Algorithm {
         // TODO: 6/11/16 delete it.
         lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-openjdk");
         System.out.println("BEFORE CREATING TEMP");
-        File tempFile = File.createTempFile("tmp", ".sh");
+        File tempFile = File.createTempFile("tmp", ".sh" , new File("/tmp"));
         System.out.println("AFTER CREATING TEMP");
 //        tempFile.setExecutable(true);
         for (String line : lines) {
