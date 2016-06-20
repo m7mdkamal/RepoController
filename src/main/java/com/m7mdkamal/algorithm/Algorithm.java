@@ -9,10 +9,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +35,14 @@ public class Algorithm {
         this.userDir = this.baseDir + username + "/";
         this.algoDir = this.userDir + algoname + "/";
 
+        File tmpFile = new File("/tmp/log.log");
+        try {
+            tmpFile.createNewFile();
+            System.setOut(new PrintStream(new FileOutputStream(tmpFile, true)));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Result init() {
@@ -75,7 +80,7 @@ public class Algorithm {
         if (mvn)
             lines.add(btool.compile());
         else {
-            File file = new File(algoDir+"target/classes/");
+            File file = new File(algoDir + "target/classes/");
             file.mkdirs();
             lines.add("javac src/main/java/" + username + "/*.java -d target/classes/ ");
         }
@@ -96,7 +101,7 @@ public class Algorithm {
     // ~/testmvn/client/mohammed/facedetection/target/classes 
     // java  -classpath . mohammed.App mohammed/App.class
 
-    public Result run(String input){
+    public Result run(String input) {
 
         List<String> lines = new ArrayList<>();
 
@@ -110,12 +115,11 @@ public class Algorithm {
 
             file = createTempFile(lines);
             System.out.println(FileUtils.readFileToString(file));
-             out= execute(file);
-            return new Result(Status.SUCCESS, out );
+            out = execute(file);
+            return new Result(Status.SUCCESS, out);
         } catch (IOException e) {
-            return new Result(Status.SUCCESS, out , e);
+            return new Result(Status.SUCCESS, out, e);
         }
-
 
 
     }
@@ -148,10 +152,10 @@ public class Algorithm {
             file = createTempFile(lines);
             System.out.println(FileUtils.readFileToString(file));
             log = execute(file);
-            return new Result(Status.SUCCESS, log );
+            return new Result(Status.SUCCESS, log);
 
         } catch (IOException e) {
-            return new Result(Status.FAILURE, log , e);
+            return new Result(Status.FAILURE, log, e);
         }
     }
 
@@ -168,7 +172,7 @@ public class Algorithm {
 
         DefaultExecutor exec = new DefaultExecutor();
         exec.setStreamHandler(streamHandler);
-        exec.setExitValues(new int[]{0,1});
+        exec.setExitValues(new int[]{0, 1});
         exec.execute(cmdLine);
 
         return outputStream.toString();
@@ -176,7 +180,7 @@ public class Algorithm {
 
     private File createTempFile(List<String> lines) throws IOException {
         // TODO: 6/11/16 delete it.
-        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64");
+        lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-openjdk");
 
         File tempFile = File.createTempFile("tmp", ".sh");
         tempFile.setExecutable(true);
