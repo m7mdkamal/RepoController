@@ -181,8 +181,9 @@ public class Algorithm {
     private File createTempFile(List<String> lines) throws IOException {
         // TODO: 6/11/16 delete it.
         lines.add(0, "export JAVA_HOME=/usr/lib/jvm/java-openjdk");
-
+        System.out.println("BEFORE CREATING TEMP");
         File tempFile = File.createTempFile("tmp", ".sh");
+        System.out.println("AFTER CREATING TEMP");
 //        tempFile.setExecutable(true);
         for (String line : lines) {
             FileUtils.writeStringToFile(tempFile, line + "\n", true);
