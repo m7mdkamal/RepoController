@@ -5,11 +5,9 @@ package com.m7mdkamal.model;
  */
 public class JavaFile {
     private String fileName;
-    private String id;
 
-    public JavaFile(String fileName, String id) {
+    public JavaFile(String fileName) {
         this.fileName = fileName;
-        this.id = id;
     }
 
     public String getFileName() {
@@ -20,11 +18,4 @@ public class JavaFile {
         this.fileName = fileName;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 }

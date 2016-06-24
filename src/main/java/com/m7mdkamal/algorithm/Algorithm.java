@@ -35,14 +35,14 @@ public class Algorithm {
         this.userDir = this.baseDir + username + "/";
         this.algoDir = this.userDir + algoname + "/";
 
-        File tmpFile = new File("/tmp/log.log");
-        try {
-            tmpFile.createNewFile();
-            System.setOut(new PrintStream(new FileOutputStream(tmpFile, true)));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        File tmpFile = new File("/tmp/log.log");
+//        try {
+//            tmpFile.createNewFile();
+//            System.setOut(new PrintStream(new FileOutputStream(tmpFile, true)));
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public Result init() {
@@ -196,31 +196,6 @@ public class Algorithm {
         return sw.toString();
     }
 
-    public ArrayList<JavaFile> getFiles() throws IOException {
-        List<String> lines = new ArrayList<>();
-
-        lines.add("cd " + this.algoDir + "src/main/java/" + username);
-        lines.add("ls");
-        File file = null;
-        file = createTempFile(lines);
-
-        System.out.println(FileUtils.readFileToString(file));
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CommandLine cmdLine = new CommandLine(file);
-        DefaultExecutor exec = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-        exec.setStreamHandler(streamHandler);
-        exec.execute(cmdLine);
-        String linesArr[] = outputStream.toString().split("\\r?\\n");
-        ArrayList<JavaFile> jf = new ArrayList<>();
-        for (String l : linesArr) {
-            jf.add(new JavaFile(l, UUID.randomUUID().toString()));
-        }
-
-        return jf;
-    }
-
     public Boolean delete() {
         List<String> lines = new ArrayList<>();
         lines.add("rm -rf " + this.getAlgoDir());
@@ -255,5 +230,53 @@ public class Algorithm {
 
     public String getAlgoDir() {
         return algoDir;
+    }
+
+    public Result getFiles(){
+        List<String> lines = new ArrayList<>();
+
+        lines.add("cd " + this.algoDir + "src/main/java/" + username);
+        lines.add("ls");
+        File file = null;
+        try {
+            file = createTempFile(lines);
+            String output = execute(file);
+            return new Result(Status.SUCCESS,output);
+        } catch (IOException e) {
+            return new Result(Status.FAILURE,"",e);
+        }
+    }
+
+    public Result getFile(String filename) {
+        List<String> lines = new ArrayList<>();
+
+        lines.add("cd " + this.algoDir + "src/main/java/" + username);
+        lines.add("cat "+filename);
+        File file = null;
+        try {
+            file = createTempFile(lines);
+            String javaClass = execute(file);
+            return new Result(Status.SUCCESS,javaClass);
+        } catch (IOException e) {
+            return new Result(Status.FAILURE,"",e);
+        }
+
+    }
+
+    public Result deleteFile(String filename){
+        List<String> lines = new ArrayList<>();
+
+        lines.add("cd " + this.algoDir + "src/main/java/" + username);
+        lines.add("rm "+filename);
+        File file = null;
+
+        try {
+            file = createTempFile(lines);
+
+            return new Result(Status.SUCCESS, execute(file));
+        } catch (IOException e) {
+            return new Result(Status.FAILURE, null , e);
+
+        }
     }
 }
