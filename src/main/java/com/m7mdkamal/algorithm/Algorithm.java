@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.io.*;
+import java.nio.file.DirectoryNotEmptyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,8 @@ public class Algorithm {
         //create new directory for the user if not exist
         File parent = new File(userDir);
         parent.mkdir();
+        if(repoExist())
+            return new Result(Status.FAILURE, "" , new DirectoryNotEmptyException(algoDir));
         String log = "";
         try {
             List<String> lines = new ArrayList<>();
@@ -72,6 +75,10 @@ public class Algorithm {
     }
 
     public Result compile(boolean mvn) {
+
+        if(!repoExist())
+            return new Result(Status.FAILURE, "" , new Exception("Repo not found " + algoDir));
+
         List<String> lines = new ArrayList<>();
         lines.add("cd " + this.algoDir);
 
@@ -90,7 +97,7 @@ public class Algorithm {
         try {
             file = createTempFile(lines);
             System.out.println(FileUtils.readFileToString(file));
-            log = execute(file);
+            log = execute(file , new int[]{0});
             return new Result(Status.SUCCESS, log);
         } catch (IOException e) {
             return new Result(Status.FAILURE, log, e);
@@ -164,15 +171,18 @@ public class Algorithm {
         return "cd " + this.baseDir + username + ";\n";
     }
 
-
     private String execute(File file) throws IOException {
+        return execute(file , new int[]{0, 1});
+    }
+
+    private String execute(File file , int[] exitValues) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         CommandLine cmdLine = new CommandLine(file);
         PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 
         DefaultExecutor exec = new DefaultExecutor();
         exec.setStreamHandler(streamHandler);
-        exec.setExitValues(new int[]{0, 1});
+        exec.setExitValues(exitValues);
         exec.execute(cmdLine);
 
         return outputStream.toString();
@@ -210,6 +220,11 @@ public class Algorithm {
             return false;
         }
         return true;
+    }
+
+    private boolean repoExist(){
+        File file = new File(algoDir);
+        return file.isDirectory();
     }
 
     public String getUsername() {

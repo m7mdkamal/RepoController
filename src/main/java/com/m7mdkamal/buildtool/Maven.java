@@ -14,7 +14,7 @@ public class Maven implements BuildTool{
     private String groudId = "username";
     private String artifactId= "test";
     private String archetypeArtifactId = "maven-archetype-quickstart";
-    private String archetypeCatalog = "local,remote";
+    private String archetypeCatalog = "local";
 
 
     public Maven(String username, String algoname) {

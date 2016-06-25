@@ -39,6 +39,19 @@ public class TestApp {
     }
 
     @Test
+    public void testCompileWithoutInit(){
+        //test with maven
+        Result result = algo.compile();
+        System.out.println(result.toString());
+        Assert.assertEquals(Status.FAILURE, result.getStatus());
+
+        //test with javac
+        result = algo.compile(false);
+        System.out.println(result.toString());
+        Assert.assertEquals(Status.FAILURE, result.getStatus());
+    }
+
+    @Test
     public void testCompile() {
         Result result = algo.init();
         Assert.assertEquals(Status.SUCCESS, result.getStatus());
@@ -56,8 +69,6 @@ public class TestApp {
 
     @Test
     public void testUpdateFile() {
-
-
         Result result = algo.init();
         Assert.assertEquals(Status.SUCCESS, result.getStatus());
 
@@ -82,6 +93,32 @@ public class TestApp {
     }
 
     @Test
+    public void testCompileError() {
+        Result result = algo.init();
+        Assert.assertEquals(Status.SUCCESS, result.getStatus());
+
+        algo.updateFile("App.java", "package Username;\n" +
+                "\n" +
+                "/**\n" +
+                " * Hello world!\n" +
+                " *\n" +
+                " */\n" +
+                "public class App \n" +
+                "{\n" +
+                "    public static void main( String[] args )\n" +
+                "    {\n" +
+                "        System.out.println( \"Hello me!\" )\n" +
+                "    }\n" +
+                "}\n");
+
+        result = algo.compile(false);
+        System.out.println(result.toString());
+        Assert.assertEquals(Status.FAILURE, result.getStatus());
+
+    }
+
+
+    @Test
     public void testRun() {
         algo.init();
         algo.compile();
@@ -89,6 +126,7 @@ public class TestApp {
         System.out.println(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.getStatus());
     }
+
 
     @Test
     public void testUpdateDependency() {
